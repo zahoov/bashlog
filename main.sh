@@ -82,10 +82,10 @@ fi
 if [[ -e $LOCAL_BCAN ]]; then
 	# >> means stdout to file, appending
 	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" >> $BCAN_LOCAL &
-	T1=${!}
+	T2=${!}
 else
 	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" > $BCAN_LOCAL &
-	T1=${!}
+	T2=${!}
 fi
 
 ############################################
