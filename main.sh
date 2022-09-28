@@ -71,20 +71,21 @@ BCAN_LOCAL=/home/$PI_NAME/bashLogging/logs/$INTERFACE_BCAN/$TRUCKNAME\_$YEAR$MON
 # For canA
 if [[ -e $LOCAL_ACAN ]]; then
 	# >> means stdout to file, appending
-	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" >> $ACAN_LOCAL &
+	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" >> $ACAN_LOCAL &
 	T1=${!}
 else
-	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" > $ACAN_LOCAL &
+	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $ACAN_LOCAL &
 	T1=${!}
+	echo $T1
 fi
 
 # For canB
 if [[ -e $LOCAL_BCAN ]]; then
 	# >> means stdout to file, appending
-	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" >> $BCAN_LOCAL &
+	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" >> $BCAN_LOCAL &
 	T2=${!}
 else
-	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" > $BCAN_LOCAL &
+	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $BCAN_LOCAL &
 	T2=${!}
 fi
 
@@ -120,11 +121,12 @@ while true; do
 		#LOGSTART=$(date | cut -d ' ' -f 4 | cut -d ':' -f 1-4 --output-delimiter '-')
 
 		kill -s SIGTERM ${T1}
+		kill -s SIGTERM ${T2}
 
-		candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" > $ACAN_LOCAL &
+		candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $ACAN_LOCAL &
 		T1=${!}
 
-		candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	/" > $BCAN_LOCAL &
+		candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $BCAN_LOCAL &
 		T2=${!}
 
 
