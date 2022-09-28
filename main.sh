@@ -63,18 +63,21 @@ TIMESTART=$(date +%T)
 ############################################
 
 # Sets the directory and first file name for the logging
-ACAN_LOCAL=/home/$PI_NAME/bashLogging/logs/$INTERFACE_ACAN/$TRUCKNAME\_$YEAR$MONTH$DAY$NUMSTART\_$INTERFACE_ACAN\_$PORT_DIG.log
-BCAN_LOCAL=/home/$PI_NAME/bashLogging/logs/$INTERFACE_BCAN/$TRUCKNAME\_$YEAR$MONTH$DAY$NUMSTART\_$INTERFACE_BCAN\_$PORT_DIG.log
+#ACAN_LOCAL=/home/$PI_NAME/bashLogging/$TRUCKNAME\_$YEAR$MONTH$DAY$NUMSTART\_$INTERFACE_ACAN\_$PORT_DIG.log
+
+
+ACAN_LOCAL=/home/$PI_NAME/bashLogging/logs/$INTERFACE_ACAN/$TRUCKNAME\_$YEAR$MONTH$DAY$TIMESTART\_$INTERFACE_ACAN\_$PORT_DIG.log
+BCAN_LOCAL=/home/$PI_NAME/bashLogging/logs/$INTERFACE_BCAN/$TRUCKNAME\_$YEAR$MONTH$DAY$TIMESTART\_$INTERFACE_BCAN\_$PORT_DIG.log
 
 # Checking if a log file already exists with the same name - If it does it appends, if it doesn't then it is created
 
 # For canA
 if [[ -e $LOCAL_ACAN ]]; then
 	# >> means stdout to file, appending
-	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" >> $ACAN_LOCAL &
+	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	//2 ; s/	//3 ; s/	//3 ; s/	//4" >> $ACAN_LOCAL &
 	T1=${!}
 else
-	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $ACAN_LOCAL &
+	candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	//2 ; s/	//3 ; s/	//3 ; s/	//4" > $ACAN_LOCAL &
 	T1=${!}
 	echo $T1
 fi
@@ -82,10 +85,10 @@ fi
 # For canB
 if [[ -e $LOCAL_BCAN ]]; then
 	# >> means stdout to file, appending
-	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" >> $BCAN_LOCAL &
+	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	//2 ; s/	//3 ; s/	//3 ; s/	//4" >> $BCAN_LOCAL &
 	T2=${!}
 else
-	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $BCAN_LOCAL &
+	candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	//2 ; s/	//3 ; s/	//3 ; s/	//4" > $BCAN_LOCAL &
 	T2=${!}
 fi
 
@@ -117,21 +120,27 @@ while true; do
 
 # Main check to see if the next hour has begun - If it has it gets the current time, terminates the previous candump logging process, and starts a new one
 	if [[ $DIFF -eq 10 ]]; then
-		#echo "swappin"
+		echo "swappin"
 		#LOGSTART=$(date | cut -d ' ' -f 4 | cut -d ':' -f 1-4 --output-delimiter '-')
 
-		kill -s SIGTERM ${T1}
-		kill -s SIGTERM ${T2}
+		kill -s SIGINT ${T1}
+		echo "killing $T1, canA"
+		kill -s SIGINT ${T2}
+		echo "killing $T2, canB"
 
-		candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $ACAN_LOCAL &
+		ACAN_LOCAL=/home/$PI_NAME/bashLogging/logs/$INTERFACE_ACAN/$TRUCKNAME\_$YEAR$MONTH$DAY$TIMESTART\_$INTERFACE_ACAN\_$PORT_DIG.log
+		BCAN_LOCAL=/home/$PI_NAME/bashLogging/logs/$INTERFACE_BCAN/$TRUCKNAME\_$YEAR$MONTH$DAY$TIMESTART\_$INTERFACE_BCAN\_$PORT_DIG.log
+
+		candump $INTERFACE_ACAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	//2 ; s/	//3 ; s/	//3 ; s/	//4" > $ACAN_LOCAL &
 		T1=${!}
 
-		candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/" > $BCAN_LOCAL &
+		candump $INTERFACE_BCAN | sed -e "s/ /	/g ; s/	/$TIMESTART/ ; s/	//2 ; s/	//3 ; s/	//3 ; s/	//4" > $BCAN_LOCAL &
 		T2=${!}
 
 
 		NUMSTART=$(date +%S)
 		NUMSTART=${NUMSTART#0}
+		TIMESTART=$(date +%T)
 	fi
 
 
